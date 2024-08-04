@@ -34,7 +34,7 @@ module confusedcore (
     logic        stall;
     logic        adrSrc;
     logic        aluSrc;
-    logic [2:0]  opCtrl;
+    logic [1:0]  opCtrl;
     logic        ramWrite;
     logic [2:0]  resultSrc;
     logic        comp;
