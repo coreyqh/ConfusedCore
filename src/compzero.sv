@@ -13,11 +13,11 @@ module compzero (
     input  logic [15:0] a, 
     output logic  [1:0] comp // {A==0, A>0}
 );
-
     logic eq, gt;
-
-    assign eq   = (a == 0);
-    assign gt   = (a > 0);
+    // input = 0 if all zeros
+    assign eq   = (a == 16'b0);
+    // input > 0 if sign != 0 and eq != 0
+    assign gt   = (!a[15] && !eq);
+    // combine into 2 bit signal
     assign comp = {eq, gt};
-
 endmodule
