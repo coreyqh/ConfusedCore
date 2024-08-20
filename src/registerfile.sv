@@ -22,7 +22,7 @@ module registerfile (
 
     // asynchronous read
     assign rd1 = (ra1 == 0) ? 0 : REGFILE[ra1];
-    assign rd2 = (RA2 == 0) ? 0 : REGFILE[ra2];
+    assign rd2 = (ra2 == 0) ? 0 : REGFILE[ra2];
     //                        ^---------------- r0 hardwired to 0
 
     // synchronous write
