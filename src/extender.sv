@@ -10,10 +10,11 @@ https://github.com/coreyqh/ConfusedCore
 */
 
 module extender (
+    input  logic        ExtType, // 1 for sign, 0 for zero
     input  logic [7:0]  rawImm,
     output logic [15:0] extImm
 );
 
-    assign extImm = {{8{rawImm[7]}}, rawImm};
+    assign extImm = {{8{(ExtType ? rawImm[7] | 0)}}, rawImm};
 
 endmodule
