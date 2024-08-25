@@ -17,8 +17,8 @@ module alu (
 
     logic add, sub;
 
-    assign add = b + a;
-    assign sub = b - a;
+    assign add = a + b;
+    assign sub = a - b;
 
     assign aluresult = aluCtrl ? sub : add;
     
