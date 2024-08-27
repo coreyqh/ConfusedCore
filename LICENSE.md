@@ -1,5 +1,5 @@
 # Acknowledgement
-The *hmmm* isntruction set architecture (ISA) and associated documentation is property of the instructors of CS5 and Harvey Mudd College. This ISA is part of the classroom materials for CS5 at Harvey Mudd College, all of which which is licenced under under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) Creative Commons License (available here: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode). All work for, or modification of, this project is must done in accordance with this agreement in addition to the license below.
+The *hmmm* isntruction set architecture (ISA) and associated documentation is property of the instructors of CS5 and Harvey Mudd College. This ISA is part of the classroom materials for CS5 at Harvey Mudd College, all of which which is licenced under under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) Creative Commons License (available here: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode). All work for, or modification of, this project must be done in compliance with this agreement in addition to the license below.
 
 # Educational Use License
 
