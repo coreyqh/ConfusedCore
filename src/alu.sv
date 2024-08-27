@@ -11,7 +11,7 @@ https://github.com/coreyqh/ConfusedCore
 
 module alu (
     input  logic [15:0] a, b,
-    input  logic        aluCtrl, // opCtrl[0]
+    input  logic        aluCtrl, // OpCtrl[0]
     output logic [15:0] aluresult
 );
 
