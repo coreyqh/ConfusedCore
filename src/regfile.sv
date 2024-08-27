@@ -11,8 +11,8 @@ https://github.com/coreyqh/ConfusedCore
 
 module regfile (
     input  logic        clk,
-    input  logic [3:0]  ra1, ra2, wa3,
     input  logic        we3,
+    input  logic [3:0]  ra1, ra2, wa3,
     input  logic [15:0] wd3,
     output logic [15:0] rd1, rd2 
 );
