@@ -100,6 +100,6 @@ module confusedcore (
     //    controller    //
     //////////////////////
     
-    controller ctrl         (.Op(Instr[15:12]), .FuncID(Instr[3:0]), .*);
+    controller  ctrl        (.Op(Instr[15:12]), .FuncID(Instr[3:0]), .*);
 
 endmodule

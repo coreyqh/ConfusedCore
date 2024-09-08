@@ -69,7 +69,7 @@ For setn, ***ExtImm*** can be input to the multiplexer that drives the ***Result
 
 For loadn and storen, the 8 bit address used to access data memory must be taken from bits 7:0 of the immediate. However, since loadn and storen will use the contents of the register addressed by bits 7:4 of ***Instr***, the 8 bits can be sampled after the multiplexer used to pick the first ALU input to reuse this block. For loadn, the read data output from data memory (***DMEMOut*** $_{15:0}$) is added as an input to the multiplexer driving ***Result*** so the read data can be written back to the desitnation register. For storen, the data to write to memory comes from the the register contents addressed by bits 11:8 of ***Instr***, so ***RD2*** is connected to the write port on the data memory module. 
 
-![Fig7](images/confusedcore/confusedcore7.png)  
+![Fig7](images/confusedcore/confusedcore7.png)  <UPDATED VERSION AVAILABLE (DMEMOUT SHOULD BE BLUE)>
 
 For the jump instructions ending in n (jeqzn, jnezn, jgtzn, jltzn) and calln, the immediate must be multiplexed with the incremented PC (***PCPlus1*** $_{7:0}$) to drive ***NextPC*** in order to set the program counter to the arbitrary unsigned integer in the immediate field of the instruction. Additionally, calln requires that ***NextPC*** to be written to a register, which requires the signal to be zero extended and added as an input to the result multiplexer. Finally, the conditional jumps require a comparator to determine the relationship between ***RD2*** and zero, which produces a two bit signal ***Comp*** $_{1:0}$. The controller will use this to determine the source signal for the PC multiplexer. 
 
@@ -138,5 +138,5 @@ The controller will contain combinational logic for the standard single cycle op
 
 ![Fig12](images/confusedcore/confusedcore12.png)  
 
-And with that, the top level design of the ConfusedCore processor is complete. All that's left is to fill in the blocks in the top level diagram. See ConfusedCore/docs/ for documentation of all nontrivial blocks that make up this block diagram.  
+And with that, the top level design of the ConfusedCore processor is complete. All that's left is to fill in the blocks in the top level diagram. See ConfusedCore/docs/* for documentation of all nontrivial blocks that make up this block diagram.  
 
