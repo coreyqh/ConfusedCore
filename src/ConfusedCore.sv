@@ -76,7 +76,7 @@ module confusedcore (
     mux2 #(16)  Arg2Mux     (RD2,  16'b1, ALUSrc2, ALUArg2);
     mux2 #(8)   AdrMux      (ALUArg1[7:0], ALUOut[7:0], AdrSrc, DMEMAdr);
     mux3 #(8)   PCMux       (PCPlus1, Instr[7:0], RD2[7:0], PCSrc, NextPC);
-    mux7 #(16)  ResultMux   (DMEMOut, ALUOut, DivOut, MultOut, ExtImm, {8'b0, NextPC}, ParallelIn, ResultSrc, Result);
+    mux7 #(16)  ResultMux   (DMEMOut, ALUOut, DivOut, MultOut, ExtImm, {8'b0, PCPlus1}, ParallelIn, ResultSrc, Result);
 
     // PC incrementer
     adder       PCAdder     (PC, 8'b1, PCPlus1);
