@@ -70,7 +70,7 @@ For combinational logic, it's usually best to start with a truth table. However,
 | 010           | div block output written back to register file
 | 011           | mul block output written back to register file
 | 100           | Extended immediate written back to register file
-| 101           | Zero extended ***NextPC*** written back to register file
+| 101           | Zero extended ***PCPlus1*** written back to register file
 | 110           | ***ParallelIn*** written back to register file
 
 
@@ -78,29 +78,34 @@ Now, we are ready to fill out the decoder block by creating and implementing a t
 
 | **Instruction**|  Op  | FuncID | Comp   | Flash | PCSrc | A2Src | A3Src | ExtType | RFWrite | ALUSrc1 | ALUSrc2 | OpCtrl | AdrSrc | DMWrite | ResultSrc | 
 |:-              |:-:   |:-:     |:-:     |:-:    |:-:    |:-:    |:-:    |:-:      |:-:      |:-:      |:-:      |:-:     |:-:     |:-:      |:-:        |
-| add            | 0110 |  xxxx  |  xx    |   0   |  00   |
-| sub            | 0111 |  xxxx  |  xx    |   0   |  00   |
-| mul            | 1000 |  xxxx  |  xx    |   0   |  00   |
-| setn           | 0001 |  xxxx  |  xx    |   0   |  00   |
-| addn           | 0101 |  xxxx  |  xx    |   0   |  00   |
-| storen         | 0011 |  xxxx  |  xx    |   0   |  00   |
-| loadn          | 0010 |  xxxx  |  xx    |   0   |  00   |
-| storer         | 0100 |  0001  |  xx    |   0   |  00   |
-| loadr          | 0100 |  0000  |  xx    |   0   |  00   |
-| pushr          | 0100 |  0011  |  xx    |   0   |  00   |
-| popr           | 0100 |  0010  |  xx    |   0   |  00   |
-| jeqzn          | 1100 |  xxxx  |  1x    |   0   |  01   |
-|                |      |        |  0x    |   0   |  00   |
-| jnezn          | 1101 |  xxxx  |  0x    |   0   |  01   |
-|                |      |        |  1x    |   0   |  00   |
-| jgtzn          | 1110 |  xxxx  |  x1    |   0   |  01   |
-|                |      |        |  x0    |   0   |  00   |
-| jltzn          | 1111 |  xxxx  |  00    |   0   |  01   |
-|                |      |        |1x or x1|   0   |  00   |
-| jumpr          | 0000 |  0011  |  xx    |   0   |  11   |
-| calln          | 1011 |  xxxx  |  xx    |   0   |  01   |
-| *flash*        | xxxx |  xxxx  |  xx    |   1   |  00   |
+| add            | 0110 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    |    1    |    0    |    0    |   00   |    x   |    0    |    001    |
+| sub            | 0111 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    |    1    |    0    |    0    |   01   |    x   |    0    |    001    |
+| mul            | 1000 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    |    1    |    x    |    0    |   0x   |    x   |    0    |    011    |
+| div            | 1001 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    | ~DivBusy|    x    |    0    |   10   |    x   |    0    |    010    |
+| mod            | 1010 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    | ~DivBusy|    x    |    0    |   11   |    x   |    0    |    010    |
+| setn           | 0001 |  xxxx  |   xx   |   0   |  00   |   x   |   0   |    1    |    1    |    x    |    x    |   0x   |    x   |    0    |    100    |
+| addn           | 0101 |  xxxx  |   xx   |   0   |  00   |   0   |   0   |    1    |    1    |    1    |    0    |   00   |    x   |    0    |    001    |
+| storen         | 0011 |  xxxx  |   xx   |   0   |  00   |   0   |   x   |    0    |    0    |    1    |    x    |   0x   |    0   |    1    |    xxx    |
+| loadn          | 0010 |  xxxx  |   xx   |   0   |  00   |   x   |   0   |    0    |    1    |    1    |    x    |   0x   |    0   |    0    |    000    |
+| storer         | 0100 |  0001  |   xx   |   0   |  00   |   0   |   x   |    x    |    0    |    0    |    x    |   0x   |    0   |    1    |    xxx    |
+| loadr          | 0100 |  0000  |   xx   |   0   |  00   |   x   |   0   |    x    |    1    |    0    |    x    |   0x   |    0   |    0    |    000    |
+| pushr          | 0100 |  0011  |   xx   |   0   |  00   |   x   |   1   |    x    |    1    |    0    |    1    |   00   |    0   |    1    |    001    |
+| popr           | 0100 |  0010  |   xx   |   0   |  00   |   x   |  1→0  |    x    |    1    |    0    |    1    |   01   |   1→0  |    0    |  001→000  |
+| jeqzn          | 1100 |  xxxx  |   1x   |   0   |  01   |   x   |   x   |    0    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+|                |      |        |   0x   |   0   |  00   |   x   |   x   |    0    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+| jnezn          | 1101 |  xxxx  |   0x   |   0   |  01   |   x   |   x   |    0    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+|                |      |        |   1x   |   0   |  00   |   x   |   x   |    0    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+| jgtzn          | 1110 |  xxxx  |   x1   |   0   |  01   |   x   |   x   |    0    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+|                |      |        |   x0   |   0   |  00   |   x   |   x   |    0    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+| jltzn          | 1111 |  xxxx  |   00   |   0   |  01   |   x   |   x   |    0    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+|                |      |        |1x or x1|   0   |  00   |   x   |   x   |    0    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+| jumpr          | 0000 |  0011  |   xx   |   0   |  10   |   0   |   x   |    x    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+| calln          | 1011 |  xxxx  |   xx   |   0   |  01   |   x   |   0   |    x    |    1    |    x    |    x    |   0x   |    x   |    0    |    101    |
+| read           | 0000 |  0001  |   xx   |   0   |  00   |   x   |   0   |    x    |    1    |    x    |    x    |   0x   |    x   |    0    |    110    |
+| write          | 0000 |  0010  |   xx   |   0   |  00   |   0   |   x   |    x    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+| *flash*        | xxxx |  xxxx  |   xx   |   1   |  00   |   x   |   x   |    x    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
+
 
 ### I/O FSM 
 
-div, mod, read, write, halt and FLASH
+read, write, halt and FLASH
