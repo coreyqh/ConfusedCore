@@ -14,7 +14,7 @@ The 16 bit instruction binaries are organized into 4 different general formats:
 | Format     | 15:12   | 11:8                 | 7:4                | 3:0                 | Examples 
 | :-         | :-      | :-                   | :-                 | :-                  | :-      
 | Reg Type   | Op Code | Destination Register | Source Register 1  | Source Register 2   | add, sub, mul, div, mod
-| Imm Type   | Op Code | Destination Register | Immediate $_{7:4}$ | Immediate $_{3:0}$  | setn, addn, loadn, storen, j*xxx*n, calln
+| Imm Type   | Op Code | Destination Register | Immediate[7:4]     | Immediate [3:0]     | setn, addn, loadn, storen, j*xxx*n, calln
 | Mem Type   | Op Code | Destination Register | Address Register   | Function Identifier | loadr, popr
 |            | Op Code | Source Register      | Address Register   | Function Identifier | storer, pushr
 | PC Type    | 0000    | Destination Register | 0000               | Function Identifier | read
@@ -39,21 +39,21 @@ The design of this processor assumes that the flashed program has been assembled
 
 ## Building the Datapath  
 
-The design approach for designing the datapath was to implement each different type of instruction one at a time. However, to avoid endless redesign, each new element was designed with all of the others in mind, along with the general design considerations above. Before routing any blocks together, the design begins with blocks for an instruction memory, data memory, register file, and program counter flip-flop (With an inverted enable signal to allow the datapath to be stalled for multicycle operations), and signals for the program counter (***PC*** $_{7:0}$), clock (***clk***), and ***reset***. At the rising clock edge, the program counter is updated to the input of the PC Flop, ***NextPC*** $_{7:0}$, which for the moment will simply be the current ***PC*** incremented by 1.   
+The design approach for designing the datapath was to implement each different type of instruction one at a time. However, to avoid endless redesign, each new element was designed with all of the others in mind, along with the general design considerations above. Before routing any blocks together, the design begins with blocks for an instruction memory, data memory, register file, and program counter flip-flop (With an inverted enable signal to allow the datapath to be stalled for multicycle operations), and signals for the program counter (***PC***[7:0]), clock (***clk***), and ***reset***. At the rising clock edge, the program counter is updated to the input of the PC Flop, ***NextPC***[7:0], which for the moment will simply be the current ***PC*** incremented by 1.   
 
 ![Fig1](images/confusedcore/confusedcore1.png)  
 
 ### Reg Type Instrictions  
 
- After ***NextPC*** is passed through the flop on the rising clock edge, the instruction if fetched from instruction memory using ***PC*** as the read address. From there, the instruction (***Instr*** $_{15:0}$) is decomposed to access the different components. Bits 15:12 are always the Op Code, and will be handled by the controller. The other three 4-bit nibbles that make up the instruction act as source and destination register addresses for Reg Type Instructions. If souce and destination registers were consisten (as is the case with RISC-V), then these bits from ***Instr*** could be routed directly to the register file address inputs. However, as noted previously, bits 11:8 can be both a source and a destination register. By inspecting, we see that bits 11:8 and 3:0 are never both source registers simultaneously, so the two can be multiplexed for one of the read ports, while bits 7:4 can be connected directly to the other read port. Additionally, only bits 11:8 act as a destination register, so they can be comnnected to the only write port of the register file.  
+ After ***NextPC*** is passed through the flop on the rising clock edge, the instruction if fetched from instruction memory using ***PC*** as the read address. From there, the instruction (***Instr***[15:0]) is decomposed to access the different components. Bits 15:12 are always the Op Code, and will be handled by the controller. The other three 4-bit nibbles that make up the instruction act as source and destination register addresses for Reg Type Instructions. If souce and destination registers were consisten (as is the case with RISC-V), then these bits from ***Instr*** could be routed directly to the register file address inputs. However, as noted previously, bits 11:8 can be both a source and a destination register. By inspecting, we see that bits 11:8 and 3:0 are never both source registers simultaneously, so the two can be multiplexed for one of the read ports, while bits 7:4 can be connected directly to the other read port. Additionally, only bits 11:8 act as a destination register, so they can be comnnected to the only write port of the register file.  
 
 ![Fig2](images/confusedcore/confusedcore2.png)  
 
-After the registers are read to create the signals ***RD1*** $_{15:0}$ and ***RD2*** $_{15:0}$, the integers they contain are used in arrithmetic operations. A simple ALU handles addition and subtration with the, a designated multiplier block handles combinational multiplication, and a multicycle division block handles division and modulo. Since the division operation has multicycle latency, it must create a busy signal (***DivBusy***) to tell the controller to stall the processor until the division is complete. These blocks have output signals ***ALUOut*** $_{15:0}$, ***MultOut*** $_{15:0}$, and ***DivOut*** $_{15:0}$, respectively.  
+After the registers are read to create the signals ***RD1***[15:0] and ***RD2*** [15:0], the integers they contain are used in arrithmetic operations. A simple ALU handles addition and subtration with the, a designated multiplier block handles combinational multiplication, and a multicycle division block handles division and modulo. Since the division operation has multicycle latency, it must create a busy signal (***DivBusy***) to tell the controller to stall the processor until the division is complete. These blocks have output signals ***ALUOut***[15:0], ***MultOut***[15:0], and ***DivOut***[15:0], respectively.  
 
 ![Fig3](images/confusedcore/confusedcore3.png)  
 
-Finally, since these instructions do not access data memory, all thats left to do is multiplex their outputs to the signal Result $_{15:0}$ and write back to the desitnation register via the write data input on the register file block. 
+Finally, since these instructions do not access data memory, all thats left to do is multiplex their outputs to the signal ***Result***[15:0] and write back to the desitnation register via the write data input on the register file block. 
 
 ![Fig4](images/confusedcore/confusedcore4.png)  
 
@@ -61,7 +61,7 @@ With that, apart from combinational and sequential control logic described later
 
 ### Imm Type Instructions  
 
-For Imm Type instructions, bits 7:0 of ***Instr*** must be extended to 16 bits to be compatible with the existing datapath. For arithmetic operations (addn, setn) the 8 bits are interpreted as a two's complement integer while for jumps and memory operations (loadn, storen, j*xxx*n, calln) they are interpreted as an 8 bit unsigned address. A sign extender block takes care of both of these cases to prepare the immediate for its use in the datapath, with the output signal ***ExtImm*** $_{15:0}$.
+For Imm Type instructions, bits 7:0 of ***Instr*** must be extended to 16 bits to be compatible with the existing datapath. For arithmetic operations (addn, setn) the 8 bits are interpreted as a two's complement integer while for jumps and memory operations (loadn, storen, j*xxx*n, calln) they are interpreted as an 8 bit unsigned address. A sign extender block takes care of both of these cases to prepare the immediate for its use in the datapath, with the output signal ***ExtImm***[15:0].
 
 ![Fig5](images/confusedcore/confusedcore5.png)   
 
@@ -69,11 +69,11 @@ For setn, ***ExtImm*** can be input to the multiplexer that drives the ***Result
 
 ![Fig6](images/confusedcore/confusedcore6.png)   
 
-For loadn and storen, the 8 bit address used to access data memory must be taken from bits 7:0 of the immediate. However, since loadn and storen will use the contents of the register addressed by bits 7:4 of ***Instr***, the 8 bits can be sampled after the multiplexer used to pick the first ALU input to reuse this block. For loadn, the read data output from data memory (***DMEMOut*** $_{15:0}$) is added as an input to the multiplexer driving ***Result*** so the read data can be written back to the desitnation register. For storen, the data to write to memory comes from the the register contents addressed by bits 11:8 of ***Instr***, so ***RD2*** is connected to the write port on the data memory module. 
+For loadn and storen, the 8 bit address used to access data memory must be taken from bits 7:0 of the immediate. However, since loadn and storen will use the contents of the register addressed by bits 7:4 of ***Instr***, the 8 bits can be sampled after the multiplexer used to pick the first ALU input to reuse this block. For loadn, the read data output from data memory (***DMEMOut***[15:0]) is added as an input to the multiplexer driving ***Result*** so the read data can be written back to the desitnation register. For storen, the data to write to memory comes from the the register contents addressed by bits 11:8 of ***Instr***, so ***RD2*** is connected to the write port on the data memory module. 
 
 ![Fig7](images/confusedcore/confusedcore7.png)
 
-For the jump instructions ending in n (jeqzn, jnezn, jgtzn, jltzn) and calln, the immediate must be multiplexed with the incremented PC (***PCPlus1*** $_{7:0}$) to drive ***NextPC*** in order to set the program counter to the arbitrary unsigned integer in the immediate field of the instruction. Additionally, calln requires that ***PCPlus1*** (the return address) to be written to a register, which requires the signal to be zero extended and added as an input to the result multiplexer. Finally, the conditional jumps require a comparator to determine the relationship between ***RD2*** and zero, which produces a two bit signal ***Comp*** $_{1:0}$. The controller will use this to determine the source signal for the PC multiplexer. 
+For the jump instructions ending in n (jeqzn, jnezn, jgtzn, jltzn) and calln, the immediate must be multiplexed with the incremented PC (***PCPlus1***[7:0]) to drive ***NextPC*** in order to set the program counter to the arbitrary unsigned integer in the immediate field of the instruction. Additionally, calln requires that ***PCPlus1*** (the return address) to be written to a register, which requires the signal to be zero extended and added as an input to the result multiplexer. Finally, the conditional jumps require a comparator to determine the relationship between ***RD2*** and zero, which produces a two bit signal ***Comp***[1:0]. The controller will use this to determine the source signal for the PC multiplexer. 
 
 ![Fig8](images/confusedcore/confusedcore8.png)  
 
@@ -99,7 +99,7 @@ Finally, the special PC type instructions require minimal changes to the datapat
 
 ![Fig10](images/confusedcore/confusedcore10.png)  
 
-For read and write, input and output parallel busses (***ParallelIn*** $_{15:0}$, ***ParallelOut*** $_{15:0}$) are connected to the result multiplexer and ***RD2***, respectively. Additionally, ***ParallelIn*** can be routed to the write data port on the instruction memory block to made use of this port for flashing programs to instruction memory.  
+For read and write, input and output parallel busses (***ParallelIn***[15:0], ***ParallelOut***[15:0]) are connected to the result multiplexer and ***RD2***, respectively. Additionally, ***ParallelIn*** can be routed to the write data port on the instruction memory block to made use of this port for flashing programs to instruction memory.  
 
 ![Fig11](images/confusedcore/confusedcore11.png)  
 
@@ -111,7 +111,7 @@ To begin building the controlled, it is best to list off all of the control sign
 
 | Signal                    | Type   | Purpose  
 | :-                        | :-     | :-  
-|***PCSrc*** $_{1:0}$       | Output | Select ***NextPC*** from the three potential sources
+|***PCSrc***[1:0]           | Output | Select ***NextPC*** from the three potential sources
 |***Stall***                | Output | Stall the PC flop during multicycle operation or halt
 |***Flash***                | Output | Enable writing to instruction memory during program flash
 |***A2Src***                | Output | Select between the two possible addresses for read port 2 in the register file
@@ -120,13 +120,13 @@ To begin building the controlled, it is best to list off all of the control sign
 |***RFWrite***              | Output | Enable writing to the register file
 |***ALUSrc1***              | Output | Select between the two possible sources for the first ALU argument
 |***ALUSrc2***              | Output | Select between the two possible sources for the second ALU argument
-|***OpCtrl*** $_{1:0}$      | Output | Tell arithmetic blocks which operation to perform (add, sub, div, mod)
+|***OpCtrl***[1:0]          | Output | Tell arithmetic blocks which operation to perform (add, sub, div, mod)
 |***AdrSrc***               | Output | Select between two possible addresses for data memory 
 |***DMWrite***              | Output | Enable writing to data memory
-|***ResultSrc*** $_{3:0}$   | Output | Select between the seven potential results to write to the register file
-|***Instr*** $_{15:12}$     | Input  | Get the op code from the instruction
-|***Instr*** $_{3:0}$       | Input  | Get the function ID for instructions that need it
-|***Comp*** $_{1:0}$        | Input  | Relay the relationship between ***RD2*** and zero for conditional jumps
+|***ResultSrc***[3:0]       | Output | Select between the seven potential results to write to the register file
+|***Instr***[15:12]         | Input  | Get the op code from the instruction
+|***Instr***[3:0]           | Input  | Get the function ID for instructions that need it
+|***Comp***[1:0]            | Input  | Relay the relationship between ***RD2*** and zero for conditional jumps
 |***DivBusy***              | Input  | Tell the controller that the division block is busy with a multicycle operation
 
 Additionally, the following signals are needed to communicate with the uncore peripheral that handles I/O and program flashing:  

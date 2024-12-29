@@ -18,13 +18,13 @@ For combinational logic, it's usually best to start with a truth table. However,
 
 | **A2Src**     | |
 | :-:           | :-    
-| 0             | Address 2 comes from ***Instr*** $_{11:8}$
-| 1             | Address 2 comes from ***Instr*** $_{3:0}$
+| 0             | Address 2 comes from ***Instr***[11:8]
+| 1             | Address 2 comes from ***Instr***[3:0]
 
 | **A3Src**     | |
 | :-:           | :-    
-| 0             | Address 3 comes from ***Instr*** $_{11:8}$
-| 1             | Address 3 comes from ***Instr*** $_{7:4}$
+| 0             | Address 3 comes from ***Instr***[11:8]
+| 1             | Address 3 comes from ***Instr***[7:4]
 
 | **ExtType**   | |
 | :-:           | :-    
@@ -105,6 +105,7 @@ Now, we are ready to fill out the decoder block by creating and implementing a t
 | write          | 0000 |  0010  |   xx   |   0   |  00   |   0   |   x   |    x    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
 | *flash*        | xxxx |  xxxx  |   xx   |   1   |  00   |   x   |   x   |    x    |    0    |    x    |    x    |   0x   |    x   |    0    |    xxx    |
 
+Note that pop necessarily takes two cycles due to writing two registers. These two cycles are represented with a → showing which signals change between the two cycles. 
 
 ### I/O FSM 
 
