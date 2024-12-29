@@ -55,7 +55,7 @@ For combinational logic, it's usually best to start with a truth table. However,
 
 | **AdrSrc**    | |
 | :-:           | :-    
-| 0             | DMEM dddress comes from ALUArg1
+| 0             | DMEM address comes from ALUArg1
 | 1             | DMEM address comes from ALUOut
 
 | **DMWrite**   | |
