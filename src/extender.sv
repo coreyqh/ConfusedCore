@@ -15,6 +15,6 @@ module extender (
     output logic [15:0] extImm
 );
 
-    assign extImm = {{8{(ExtType ? rawImm[7] | 0)}}, rawImm};
+    assign extImm = {{8{(ExtType ? rawImm[7] : 0)}}, rawImm};
 
 endmodule
