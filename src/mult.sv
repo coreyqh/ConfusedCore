@@ -14,8 +14,8 @@ module mult (
     output logic [15:0] out
 );
 
-    signed [31:0] product;
-    assign product = signed'(a) * signed'(b);
+    signed logic [31:0] product;
+    assign product = $signed(a) * $signed(b);
     assign out = product[15:0];
 
-endmodule
+endmodule   
