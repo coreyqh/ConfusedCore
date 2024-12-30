@@ -80,9 +80,9 @@ Now, we are ready to fill out the decoder block by creating and implementing a t
 |:-              |:-:   |:-:     |:-:     |:-:    |:-:    |:-:    |:-:    |:-:      |:-:      |:-:      |:-:      |:-:     |:-:     |:-:      |:-:        |
 | add            | 0110 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    |    1    |    0    |    0    |   00   |    x   |    0    |    001    |
 | sub            | 0111 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    |    1    |    0    |    0    |   01   |    x   |    0    |    001    |
-| mul            | 1000 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    |    1    |    x    |    0    |   0x   |    x   |    0    |    011    |
-| div            | 1001 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    | ~DivBusy|    x    |    0    |   10   |    x   |    0    |    010    |
-| mod            | 1010 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    | ~DivBusy|    x    |    0    |   11   |    x   |    0    |    010    |
+| mul            | 1000 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    |    1    |    x    |    x    |   0x   |    x   |    0    |    011    |
+| div            | 1001 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    | ~DivBusy|    x    |    x    |   10   |    x   |    0    |    010    |
+| mod            | 1010 |  xxxx  |   xx   |   0   |  00   |   1   |   0   |    x    | ~DivBusy|    x    |    x    |   11   |    x   |    0    |    010    |
 | setn           | 0001 |  xxxx  |   xx   |   0   |  00   |   x   |   0   |    1    |    1    |    x    |    x    |   0x   |    x   |    0    |    100    |
 | addn           | 0101 |  xxxx  |   xx   |   0   |  00   |   0   |   0   |    1    |    1    |    1    |    0    |   00   |    x   |    0    |    001    |
 | storen         | 0011 |  xxxx  |   xx   |   0   |  00   |   0   |   x   |    0    |    0    |    1    |    x    |   0x   |    0   |    1    |    xxx    |
